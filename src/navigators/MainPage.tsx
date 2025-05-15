@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import HabbitScreen from '../screens/HabitScreen'; // Replace with your actual file
+import HabbitScreen from '../screens/HabitScreen';
 import ProgressScreen from '../screens/ProgressScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
@@ -11,7 +11,7 @@ const Tab = createBottomTabNavigator();
 
 const MainPage = () => {
   return (
-     <Tab.Navigator
+    <Tab.Navigator
       screenOptions={{
         headerShown: true,
         headerStyle: {
@@ -30,14 +30,14 @@ const MainPage = () => {
           paddingBottom: 4,
           backgroundColor: '#ff993f',
         },
-        tabBarInactiveBackgroundColor : "#ff993f"
+        tabBarInactiveBackgroundColor: "#ff993f"
       }}
     >
-        <Tab.Screen name='Habbit' component={HabbitScreen}/>
-        <Tab.Screen name='Progress' component={ProgressScreen}/>
-        <Tab.Screen name='Profile' component={ProfileScreen}/>
+      <Tab.Screen name='Habbit' component={HabbitScreen} />
+      <Tab.Screen name='Progress' component={ProgressScreen} />
+      <Tab.Screen name='Profile' component={ProfileScreen} />
     </Tab.Navigator>
- 
+
   );
 };
 
