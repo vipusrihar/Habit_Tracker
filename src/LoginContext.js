@@ -5,7 +5,7 @@ const LoginContext = createContext();
 
 
 function Provider(props) {
-  const [isLoggedIn, setIsLoggedin] = useState(false);
+  const [isLoggedIn, setIsLoggedin] = useState(true);
 
   return (
     <LoginContext.Provider value={[isLoggedIn, setIsLoggedin]}>
