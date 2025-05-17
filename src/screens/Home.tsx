@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../AuthContex';
+import { useAuth } from '../LoginContex';
 
 const Home: React.FC = () => {
   const { isLoggedIn, login, logout } = useAuth();

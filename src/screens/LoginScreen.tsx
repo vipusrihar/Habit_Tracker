@@ -3,8 +3,12 @@ import React, { useContext, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoginContext from '../LoginContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { getUser } from '../utils/userStorage';
+import { User } from '../types/User';
+import { setLogin } from '../utils/LoginStorage';
+import { LoginContext } from "../LoginContex";
+
 
 const LoginScreen = () => {
   const [username, onChangeUsername] = useState('');
@@ -12,27 +16,31 @@ const LoginScreen = () => {
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
-  const [isLoggedIn, setIsLoggedin] = useContext(LoginContext);
+ const { setIsLoggedIn } = useContext(LoginContext);
 
 
   const handleLogin = async () => {
     try {
-      const userData = await AsyncStorage.getItem('@userData');
+      const userData: User | null = await getUser();
       if (userData) {
-        const originalData = JSON.parse(userData);
-        if (originalData.username === username && originalData.password === password) {
-          setIsLoggedin(true);
-          Alert.alert("Login Successful");
+        if (userData.username === username && userData.password === password) {
+          if (userData.username === username && userData.password === password) {
+            Alert.alert("Login Successful");
+            await setLogin();
+            setIsLoggedIn(true); 
+          }
         } else {
-          Alert.alert("Invalid Email or Password");
+          Alert.alert("Invalid Username or Password");
         }
       } else {
-        Alert.alert("No User Found")
+        Alert.alert("No User Found");
       }
     } catch (error) {
-      Alert.alert("Error ");
+      console.error("Login error:", error);
+      Alert.alert("Error", "Something went wrong during login");
     }
-  }
+  };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -60,6 +68,7 @@ const LoginScreen = () => {
       </SafeAreaView>
     </SafeAreaProvider>
   )
+
 }
 
 export default LoginScreen

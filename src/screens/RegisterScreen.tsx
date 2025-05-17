@@ -5,6 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginContext from '../LoginContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { registerUser } from '../utils/userStorage';
+import { User } from '../types/User';
+import { setLogin } from '../utils/LoginStorage';
 
 
 
@@ -15,10 +18,6 @@ const RegisterScreen = () => {
   const [email, onChangeEmail] = useState('');
   const [password, onChangePassword] = useState('');
   const [repassword, onChangeRePassword] = useState('');
-
-
-  const [isLoggedIn, setIsLoggedin] = useContext(LoginContext);
-
 
 
   const validateEmail = (email: any) => {
@@ -43,15 +42,13 @@ const RegisterScreen = () => {
       Alert.alert("Password Should Be Atleast 8 Characters");
       return;
     }
+    const user: User = { username, email, password }
     try {
-      const user = { username, email, password };
-      await AsyncStorage.setItem('@userData', JSON.stringify(user));
-      Alert.alert("User Registered Sucessfully");
-      setIsLoggedin(true);
-
+      await registerUser(user);
+      setLogin();
     } catch (error) {
-      Alert.alert("Error When Saving Data. Try Again ");
-      console.log('Error saving Data : ', error)
+      console.error("Registration error:", error);
+      Alert.alert("Registration Failed", "Please try again later");
     }
   }
 

@@ -20,6 +20,8 @@ import {
 import RootNavigator from './navigators/RootNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from './LoginContext';
+// import 'react-native-reanimated';
+import 'react-native-gesture-handler';
 
 // type SectionProps = PropsWithChildren<{
 //   title: string;

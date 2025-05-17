@@ -1,10 +1,10 @@
-// Enum for different types of habits
-export type HabitType = "daily" | "weekly" | "monthly" | "goal" | "checklist";
 
-// Enum for progress tracking method
+export type HabitType = "daily" | "weekly" | "monthly" ;
+
+
 export type ProgressType = "boolean" | "count" | "percentage";
 
-// Individual checklist item (for checklist-type habits)
+
 export interface ChecklistItem {
   id: string;
   title: string;
@@ -24,5 +24,5 @@ export interface HabitTask {
   streakCount: number;
   completionHistory: string[]; // Dates in ISO format
   checklistItems?: ChecklistItem[]; // Only for type === "checklist"
-  colorTag?: string; // Optional for UI color grouping
+  color?: string; // Optional for UI color grouping
 }
