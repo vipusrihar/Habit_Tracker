@@ -2,7 +2,6 @@ import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'reac
 import React, { useContext, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getUser } from '../utils/userStorage';
 import { User } from '../types/User';
@@ -28,6 +27,7 @@ const LoginScreen = () => {
             Alert.alert("Login Successful");
             await setLogin();
             setIsLoggedIn(true); 
+            // navigation.navigate('MainPage')
           }
         } else {
           Alert.alert("Invalid Username or Password");

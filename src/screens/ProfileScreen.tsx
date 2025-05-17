@@ -1,15 +1,19 @@
 import { StyleSheet, Text, View, TouchableOpacity, Alert, Image } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { setLogout } from '../utils/LoginStorage'
 import { deleteUser } from '../utils/userStorage'
+import { LoginContext } from '../LoginContex'
 
 const ProfileScreen = () => {
+
+  
+   const { setIsLoggedIn } = useContext(LoginContext);
   const handleLogout = () => {
     Alert.alert(
       'Logout',
       'Are You sure You Want To Logout?',
       [
-        { text: 'Yes', style: 'destructive', onPress: () => setLogout() },
+        { text: 'Yes', style: 'destructive', onPress: () => {setLogout(), setIsLoggedIn(false) } },
         { text: 'Cancel', style: 'cancel' },
       ]
     )
