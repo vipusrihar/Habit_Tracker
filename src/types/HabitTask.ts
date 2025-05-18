@@ -16,7 +16,6 @@ export interface HabitTask {
   id: string;
   title: string;
   type: HabitType;
-  frequency: string; // e.g., "daily", "3 times/week"
   targetValue?: number; // For count/goal-based habits
   progressType: ProgressType;
   startDate: string; // ISO format date

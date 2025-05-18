@@ -28,7 +28,6 @@ const AddHabitForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [type, setType] = useState<HabitType>('daily');
-  const [frequency, setFrequency] = useState('daily');
   const [progressType, setProgressType] = useState<ProgressType>('boolean');
   const [targetValue, setTargetValue] = useState<string>('');
   const [color, setColor] = useState('#00bcd4');
@@ -49,7 +48,6 @@ const AddHabitForm = () => {
       id: generateId(),
       title,
       type,
-      frequency,
       progressType,
       targetValue:
         progressType !== 'boolean' && targetValue
@@ -68,7 +66,6 @@ const AddHabitForm = () => {
           text: "OK",
           onPress: () => {
             setTitle('');
-            setFrequency('daily');
             setProgressType('boolean');
             setTargetValue('');
             setType('daily');
@@ -106,14 +103,6 @@ const AddHabitForm = () => {
         <Picker.Item label="Weekly" value="weekly" />
         <Picker.Item label="Monthly" value="monthly" />
       </Picker>
-
-      <Text style={styles.label}>Frequency</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., 3 times/week"
-        value={frequency}
-        onChangeText={setFrequency}
-      />
 
       <Text style={styles.label}>Progress Type</Text>
       <Picker
