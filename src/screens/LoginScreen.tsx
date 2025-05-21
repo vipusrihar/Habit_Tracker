@@ -60,7 +60,7 @@ const LoginScreen = () => {
           style={styles.inputfield}
         />
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.registerLink} onPress={() => navigation.navigate('Register')}>
           <Text style={styles.registerLinkText}>Not Registered...</Text>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: 'center',
   },
-  buttonText: {
+  loginText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

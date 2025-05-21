@@ -1,27 +1,21 @@
+export type HabitType = "daily"
 
-export type HabitType = "daily" | "weekly" | "monthly" ;
+export type ProgressType = "boolean" | "count";
 
+export type CompletionHistory =
+  | string[] // for boolean habits (array of completed dates)
+  | { [date: string]: number }; // for count habits (map of date -> value)
 
-export type ProgressType = "boolean" | "count" | "percentage";
-
-
-export interface ChecklistItem {
-  id: string;
-  title: string;
-  completed: boolean;
-}
-
-// Main Habit Task Type
 export interface HabitTask {
   id: string;
   title: string;
-  type: HabitType;
-  targetValue?: number; // For count/goal-based habits
-  progressType: ProgressType;
-  startDate: string; // ISO format date
-  endDate?: string; // For goal-based habits
+  type: 'daily' 
+  progressType: 'boolean' | 'count';
+  targetValue?: number;
+  startDate: string; 
   streakCount: number;
-  completionHistory: string[]; // Dates in ISO format
-  checklistItems?: ChecklistItem[]; // Only for type === "checklist"
-  color?: string; // Optional for UI color grouping
+  color: string;
+  completionHistory: {
+    [date: string]: boolean | number; // '2025-05-20': true | 3
+  };
 }

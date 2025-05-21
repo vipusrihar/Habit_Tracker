@@ -1,27 +1,37 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert, Image } from 'react-native'
-import React, { useContext } from 'react'
-import { setLogout } from '../utils/LoginStorage'
-import { deleteUser } from '../utils/userStorage'
-import { LoginContext } from '../LoginContex'
+import { StyleSheet, Text, View, TouchableOpacity, Alert, Image } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { setLogout } from '../utils/LoginStorage';
+import { deleteUser, getUser } from '../utils/userStorage';
+import { LoginContext } from '../LoginContex';
+import { User } from '../types/User';
 
 const ProfileScreen = () => {
+  const { setIsLoggedIn } = useContext(LoginContext);
+  const [user, setUser] = useState<User | null>(null);
 
-  
-   const { setIsLoggedIn } = useContext(LoginContext);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const storedUser = await getUser();
+      if (storedUser) {
+        setUser(storedUser);
+      } else {
+        console.log("No user found");
+      }
+    };
+    fetchUser();
+  }, []);
+
   const handleLogout = () => {
     Alert.alert(
       'Logout',
-      'Are You sure You Want To Logout?',
+      'Are you sure you want to logout?',
       [
-        { text: 'Yes', style: 'destructive', onPress: () => {setLogout(), setIsLoggedIn(false) } },
+        { text: 'Yes', style: 'destructive', onPress: () => { setLogout(); setIsLoggedIn(false); } },
         { text: 'Cancel', style: 'cancel' },
       ]
-    )
-  }
+    );
+  };
 
-  const handleInfo = () => {
-    Alert.alert('Info', 'This is your progress screen. Track your achievements here.')
-  }
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -31,60 +41,72 @@ const ProfileScreen = () => {
         { text: 'Delete', style: 'destructive', onPress: () => deleteUser() },
         { text: 'Cancel', style: 'cancel' },
       ]
-    )
+    );
+  };
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading user...</Text>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>{user.username}</Text>
+      <Text style={styles.title}>{user.email}</Text>
 
       <View style={styles.iconContainer}>
         <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
           <Image style={styles.buttonImage} source={require('../assests/icons/logout.png')} />
-          <Text style={styles.iconLabel}>Logout</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.iconButton} onPress={handleInfo}>
-          <Image style={styles.buttonImage} source={require('../assests/icons/info.png')} />
-          <Text style={styles.iconLabel}>Info</Text>
+          <Text style={styles.iconName}>Logout</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.iconButton} onPress={handleDeleteAccount}>
           <Image style={styles.buttonImage} source={require('../assests/icons/delete.png')} />
-          <Text style={styles.iconLabel}>Delete</Text>
+          <Text style={styles.iconName}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default ProfileScreen
+export default ProfileScreen;
+
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#fffaf2', 
     padding: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 30,
+    color: '#ff993f',
+    marginBottom: 10,
   },
   iconContainer: {
+    
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '80%',
+    marginTop:30,
   },
   iconButton: {
     alignItems: 'center',
-    backgroundColor: '#3498db',
+    backgroundColor: '#ff993f', 
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     width: 80,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   buttonImage: {
     height: 30,
@@ -92,9 +114,10 @@ const styles = StyleSheet.create({
     tintColor: '#fff',
     marginBottom: 5,
   },
-  iconLabel: {
+  iconName: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },
-})
+});
+

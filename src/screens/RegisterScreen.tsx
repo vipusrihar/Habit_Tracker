@@ -2,12 +2,11 @@ import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'reac
 import React, { useContext, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoginContext from '../LoginContext';
+import { setLogin } from '../utils/LoginStorage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { registerUser } from '../utils/userStorage';
 import { User } from '../types/User';
-import { setLogin } from '../utils/LoginStorage';
+import { LoginContext } from '../LoginContex';
 
 
 
@@ -18,7 +17,8 @@ const RegisterScreen = () => {
   const [email, onChangeEmail] = useState('');
   const [password, onChangePassword] = useState('');
   const [repassword, onChangeRePassword] = useState('');
-
+  
+  const { setIsLoggedIn } = useContext(LoginContext);
 
   const validateEmail = (email: any) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,10 +45,11 @@ const RegisterScreen = () => {
     const user: User = { username, email, password }
     try {
       await registerUser(user);
-      setLogin();
+      setIsLoggedIn(true); 
+      await setLogin();
     } catch (error) {
       console.error("Registration error:", error);
-      Alert.alert("Registration Failed", "Please try again later");
+      Alert.alert("Registration Failed", "Please Try Again Later");
     }
   }
 

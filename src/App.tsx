@@ -20,14 +20,11 @@ import {
 import RootNavigator from './navigators/RootNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from './LoginContext';
-// import 'react-native-reanimated';
 import 'react-native-gesture-handler';
 import { LoginContext } from './LoginContex';
 import { checkLoginStatus } from './utils/LoginStorage';
+import 'react-native-get-random-values';
 
-// type SectionProps = PropsWithChildren<{
-//   title: string;
-// }>;
 
 function App(): React.JSX.Element {
 

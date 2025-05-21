@@ -1,42 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   ScrollView,
-  Modal,
+  Alert,
+  View,
   TouchableOpacity,
-  Alert
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { addTask } from '../utils/HabitStorage';
+import { addTask, updateTask } from '../utils/HabitStorage';
 import { HabitTask, HabitType, ProgressType } from '../types/HabitTask';
 import { useNavigation } from '@react-navigation/native';
-// import ColorPicker, {
-//   HueSlider,
-//   OpacitySlider,
-//   Panel1,
-//   Preview,
-//   Swatches
-// } from 'reanimated-color-picker';
-
-const generateId = () => Date.now().toString();
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useRoute, RouteProp } from '@react-navigation/native';
 
 const AddHabitForm = () => {
-  const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [type, setType] = useState<HabitType>('daily');
   const [progressType, setProgressType] = useState<ProgressType>('boolean');
-  const [targetValue, setTargetValue] = useState<string>('');
-  const [color, setColor] = useState('#00bcd4');
+  const [targetValue, setTargetValue] = useState('');
+  const [color, setColor] = useState('#ff9800');
 
-  const onSelectColor = ({ hex }: any) => {
-    setColor(hex);
-  };
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const route = useRoute<RouteProp<{ params: { task?: HabitTask } }, 'params'>>();
+  const taskToEdit = route.params?.task;
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setType(taskToEdit.type);
+      setProgressType(taskToEdit.progressType);
+      setTargetValue(taskToEdit.targetValue?.toString() || '');
+    }
+  }, [taskToEdit]);
 
   const handleAdd = async () => {
     if (!title.trim()) {
@@ -45,43 +42,30 @@ const AddHabitForm = () => {
     }
 
     const newHabit: HabitTask = {
-      id: generateId(),
+      id: taskToEdit?.id || '',
       title,
       type,
       progressType,
-      targetValue:
-        progressType !== 'boolean' && targetValue
-          ? parseInt(targetValue)
-          : undefined,
-      startDate: new Date().toISOString(),
-      streakCount: 0,
-      completionHistory: [],
-      color
+      targetValue: progressType !== 'boolean' && targetValue ? parseInt(targetValue) : undefined,
+      startDate: taskToEdit?.startDate || new Date().toISOString().split("T")[0],
+      streakCount: taskToEdit?.streakCount || 0,
+      completionHistory: taskToEdit?.completionHistory || (progressType === 'boolean' ? [] : {}),
+      color,
     };
 
     try {
-      await addTask(newHabit);
-      Alert.alert("Success", "Habit Added Successfully", [
-        {
-          text: "OK",
-          onPress: () => {
-            setTitle('');
-            setProgressType('boolean');
-            setTargetValue('');
-            setType('daily');
-            navigation.navigate('Main');
-          }
-        }
-      ]);
+      if (taskToEdit) {
+        await updateTask(newHabit);
+        Alert.alert("Success", "Habit Updated Successfully");
+      } else {
+        await addTask(newHabit);
+        Alert.alert("Success", "Habit Added Successfully");
+      }
+      navigation.navigate('Main');
     } catch (error) {
-      Alert.alert("Error", "Failed to add habit");
+      console.error('Habit save error:', error);
+      Alert.alert("Error", "Failed to save habit");
     }
-
-
-
-
-    // Reset form
-
   };
 
   return (
@@ -89,25 +73,26 @@ const AddHabitForm = () => {
       <Text style={styles.label}>Habit Title</Text>
       <TextInput
         style={styles.input}
-        placeholder="e.g., Drink Water"
+        placeholder="example -> Drink Water"
         value={title}
         onChangeText={setTitle}
+        placeholderTextColor="#fda72d"
       />
 
       <Text style={styles.label}>Habit Type</Text>
       <Picker
         selectedValue={type}
         onValueChange={(value) => setType(value as HabitType)}
+        style={styles.picker}
       >
         <Picker.Item label="Daily" value="daily" />
-        <Picker.Item label="Weekly" value="weekly" />
-        <Picker.Item label="Monthly" value="monthly" />
       </Picker>
 
       <Text style={styles.label}>Progress Type</Text>
       <Picker
         selectedValue={progressType}
         onValueChange={(value) => setProgressType(value as ProgressType)}
+        style={styles.picker}
       >
         <Picker.Item label="Yes/No" value="boolean" />
         <Picker.Item label="Count" value="count" />
@@ -118,58 +103,18 @@ const AddHabitForm = () => {
           <Text style={styles.label}>Target Value</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g., 8"
+            placeholder="example -> if 8 glasses input 8"
             keyboardType="numeric"
             value={targetValue}
             onChangeText={setTargetValue}
+            placeholderTextColor="#fda72d"
           />
         </>
       )}
 
-      {/* <Text style={styles.label}>Color</Text>
-      <View style={{ alignItems: 'center', marginVertical: 10 }}>
-        <View
-          style={{
-            height: 40,
-            width: 40,
-            borderRadius: 20,
-            backgroundColor: color,
-            borderWidth: 1,
-            borderColor: '#ccc',
-            marginBottom: 10
-          }}
-        />
-        <Button title="Pick Color" onPress={() => setShowModal(true)} />
-      </View>
-
-      <Modal
-        visible={showModal}
-        animationType="slide"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <View style={styles.modalContent}>
-          <ColorPicker
-            style={{ width: '100%', height: 300 }}
-            value={color}
-            onComplete={onSelectColor}
-          >
-            <Preview />
-            <Panel1 />
-            <HueSlider />
-            <OpacitySlider />
-            <Swatches />
-          </ColorPicker>
-
-          <TouchableOpacity
-            onPress={() => setShowModal(false)}
-            style={styles.doneButton}
-          >
-            <Text style={styles.doneButtonText}>Done</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal> */}
-
-      <Button title="Add Habit" onPress={handleAdd} />
+      <TouchableOpacity style={styles.button} onPress={handleAdd}>
+        <Text style={styles.buttonText}>{taskToEdit ? 'Update Habit' : 'Add Habit'}</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -178,38 +123,42 @@ export default AddHabitForm;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16
+    padding: 16,
+    backgroundColor: '#fff8f0',
   },
   label: {
     marginTop: 12,
     marginBottom: 4,
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 16,
+    color: '#e65100',
   },
   input: {
-    borderColor: '#ccc',
+    borderColor: '#666666',
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
-    fontSize: 16
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#fff3e0',
   },
-  modalContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white'
+  picker: {
+    backgroundColor: '#fff3e0',
+    borderRadius: 8,
+    marginBottom: 8,
+    color: '#e65100',
   },
-  doneButton: {
-    marginTop: 20,
-    backgroundColor: '#00bcd4',
-    paddingVertical: 10,
+  button: {
+    backgroundColor: '#ff9800',
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 10
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: 'center',
   },
-  doneButtonText: {
+  buttonText: {
     color: 'white',
     fontSize: 16,
-    textAlign: 'center'
-  }
+    fontWeight: 'bold',
+  },
 });

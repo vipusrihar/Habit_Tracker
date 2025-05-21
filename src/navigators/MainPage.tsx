@@ -1,13 +1,11 @@
 import React from 'react';
+import { Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
 import HabbitScreen from '../screens/HabitScreen';
-import ProgressScreen from '../screens/ProgressScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import WeeklyViewScreen from '../screens/WeeklyScreenView';
 
 const Tab = createBottomTabNavigator();
-
-
 
 const MainPage = () => {
   return (
@@ -30,15 +28,46 @@ const MainPage = () => {
           paddingBottom: 4,
           backgroundColor: '#ff993f',
         },
-        tabBarInactiveBackgroundColor: "#ff993f"
+        tabBarInactiveBackgroundColor: "#ff993f",
       }}
     >
-      <Tab.Screen name='Habbit' component={HabbitScreen} />
-      <Tab.Screen name='Progress' component={ProgressScreen} />
-      <Tab.Screen name='Profile' component={ProfileScreen} />
-      
+      <Tab.Screen 
+        name='My Habbits' 
+        component={HabbitScreen} 
+        options={{ 
+          tabBarIcon: ({ focused }) => (
+            <Image 
+              source={require('../assests/icons/select-all.png')} 
+              style={{ width: 20, height: 20, tintColor: focused ? 'black' : 'gray' }} 
+            />
+          )
+        }} 
+      />
+      <Tab.Screen 
+        name='Progress' 
+        component={WeeklyViewScreen} 
+        options={{ 
+          tabBarIcon: ({ focused }) => (
+            <Image 
+              source={require('../assests/icons/calendar-mark.png')} 
+              style={{ width: 20, height: 20, tintColor: focused ? 'black' : 'gray' }} 
+            />
+          )
+        }} 
+      />
+      <Tab.Screen 
+        name='Profile' 
+        component={ProfileScreen} 
+        options={{ 
+          tabBarIcon: ({ focused }) => (
+            <Image 
+              source={require('../assests/icons/person.png')} 
+              style={{ width: 20, height: 20, tintColor: focused ? 'black' : 'gray' }} 
+            />
+          )
+        }} 
+      />
     </Tab.Navigator>
-
   );
 };
 

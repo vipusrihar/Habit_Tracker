@@ -5,6 +5,7 @@ import AddHabitForm from '../components/AddHabitForm';
 import AuthStack from './AuthStack';
 import { LoginContext } from '../LoginContex';
 import { View, ActivityIndicator, Text } from 'react-native';
+import ViewTaskScreen from '../screens/ViewTaskScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,8 +24,31 @@ const RootNavigator = () => {
   return isLoggedIn ? (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Main" component={MainPage} />
-      <Stack.Screen name="AddForm" component={AddHabitForm} />
+
+      <Stack.Screen
+        name="AddForm"
+        component={AddHabitForm}
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: '#ff993f' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
+
+      <Stack.Screen
+        name="ViewTask"
+        component={ViewTaskScreen}
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: '#ff993f' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
     </Stack.Navigator>
+
+
   ) : (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Auth" component={AuthStack} />
