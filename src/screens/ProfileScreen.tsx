@@ -4,6 +4,7 @@ import { setLogout } from '../utils/LoginStorage';
 import { deleteUser, getUser } from '../utils/userStorage';
 import { LoginContext } from '../LoginContex';
 import { User } from '../types/User';
+import { clearAllTasks } from '../utils/HabitStorage';
 
 const ProfileScreen = () => {
   const { setIsLoggedIn } = useContext(LoginContext);
@@ -38,7 +39,7 @@ const ProfileScreen = () => {
       'Delete Account',
       'Are you sure you want to delete your account?',
       [
-        { text: 'Delete', style: 'destructive', onPress: () => deleteUser() },
+        { text: 'Delete', style: 'destructive', onPress: () => {deleteUser(); clearAllTasks(); setLogout(); setIsLoggedIn(false);} },
         { text: 'Cancel', style: 'cancel' },
       ]
     );

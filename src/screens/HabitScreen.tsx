@@ -71,16 +71,12 @@ const HabitScreen = () => {
             tasks.length > 0 ? (
               tasks.map((task, index) => (
                 <View key={index} style={styles.taskItem}>
-                 <View style={{flex:1, justifyContent:"flex-start"}}>
-                   <Text style={styles.taskTitle}>{task.title}</Text>
-                  <Text style={styles.taskType}>{task.progressType}</Text>
-                  </View>
-
+                  <Text style={styles.taskTitle}>{task.title}</Text>
                   <View style={styles.buttonsContainer}>
-                    <TouchableOpacity style={styles.normalButton} onPress={() => handleViewInfo(task)}>
+                    <TouchableOpacity style={styles.button} onPress={() => handleViewInfo(task)}>
                       <Image style={styles.icon} source={require('../assests/icons/info.png')} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.normalButton} onPress={() => handleEditTask(task)}>
+                    <TouchableOpacity style={styles.button} onPress={() => handleEditTask(task)}>
                       <Image style={styles.icon} source={require('../assests/icons/edit.png')}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteTask(task.id)}>
@@ -133,13 +129,18 @@ const styles = StyleSheet.create({
     lineHeight: 36,
   },
   taskItem: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     backgroundColor: '#fff3e5',
     borderRadius: 8,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ffa856',
+    marginHorizontal: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ffa856',
+    flex:1,
+    flexDirection: 'row',
+    justifyContent:'space-between',
+    alignItems : 'center'
   },
   taskTitle: {
     fontSize: 18,
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     gap: 5,
   },
-  normalButton: {
+  button: {
     backgroundColor: '#ffaa5f', 
     padding: 10,
     borderRadius: 6,

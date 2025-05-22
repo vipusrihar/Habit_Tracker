@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 import { Calendar } from 'react-native-calendars';
 import { HabitTask } from '../types/HabitTask';
 
@@ -8,27 +8,35 @@ const ViewTaskScreen = () => {
   const route = useRoute();
   const { task }: { task: HabitTask } = route.params as any;
 
-  const markedDates = Object.entries(task.completionHistory || {}).reduce(
-    (acc: any, [date, value]) => {
-      const dateKey = new Date(date).toISOString().split('T')[0];
+  const [markedDates, setMarkedDates] = useState({});
 
-      if (task.progressType === 'boolean' && value === true) {
-        acc[dateKey] = {
-          marked: true,
-          selected: true,
-          selectedColor: '#ff993f',
-        };
-      } else if (task.progressType === 'count' && typeof value === 'number' && value > 0) {
-        acc[dateKey] = {
-          marked: true,
-          selected: true,
-          dotColor: '#ff993f',
-        };
-      }
+  useFocusEffect(
+    React.useCallback(() => {
+      const newMarkedDates = Object.entries(task.completionHistory || {}).reduce(
+        (acc: any, [date, value]) => {
+          const dateKey = new Date(date).toISOString().split('T')[0];
 
-      return acc;
-    },
-    {}
+          if (task.progressType === 'boolean' && value === true) {
+            acc[dateKey] = {
+              marked: true,
+              selected: true,
+              selectedColor: '#ff993f',
+            };
+          } else if (task.progressType === 'count' && typeof value === 'number' && value > 0) {
+            acc[dateKey] = {
+              marked: true,
+              selected: true,
+              dotColor: '#ff993f',
+            };
+          }
+
+          return acc;
+        },
+        {}
+      );
+
+      setMarkedDates(newMarkedDates);
+    }, [task])
   );
 
   return (
@@ -36,11 +44,20 @@ const ViewTaskScreen = () => {
       <Text style={styles.title}>{task.title}</Text>
 
       <View style={styles.detailBox}>
-        <Text><Text style={styles.label}>Type:</Text> {task.type}</Text>
-        <Text><Text style={styles.label}>Progress Type:</Text> {task.progressType}</Text>
-        <Text><Text style={styles.label}>Target Value:</Text> {task.targetValue || 'N/A'}</Text>
-        <Text><Text style={styles.label}>Created Date:</Text> {new Date(task.startDate).toLocaleDateString()}</Text>
+        <Text>
+          <Text style={styles.label}>Type:</Text> {task.type}
+        </Text>
+        <Text>
+          <Text style={styles.label}>Progress Type:</Text> {task.progressType}
+        </Text>
+        <Text>
+          <Text style={styles.label}>Target Value:</Text> {task.targetValue || 'N/A'}
+        </Text>
+        <Text>
+          <Text style={styles.label}>Created Date:</Text> {new Date(task.startDate).toLocaleDateString()}
+        </Text>
       </View>
+
       <Calendar
         markedDates={markedDates}
         theme={{
@@ -85,12 +102,5 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     color: '#333',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    fontWeight: 'bold',
-    color: '#ff993f',
   },
 });

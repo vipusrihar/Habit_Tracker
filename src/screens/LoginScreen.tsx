@@ -15,7 +15,7 @@ const LoginScreen = () => {
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
- const { setIsLoggedIn } = useContext(LoginContext);
+  const { setIsLoggedIn } = useContext(LoginContext);
 
 
   const handleLogin = async () => {
@@ -23,13 +23,12 @@ const LoginScreen = () => {
       const userData: User | null = await getUser();
       if (userData) {
         if (userData.username === username && userData.password === password) {
-          if (userData.username === username && userData.password === password) {
-            Alert.alert("Login Successful");
-            await setLogin();
-            setIsLoggedIn(true); 
-            // navigation.navigate('MainPage')
-          }
-        } else {
+          Alert.alert("Login Successful");
+          await setLogin();
+          setIsLoggedIn(true);
+          // navigation.navigate('MainPage')
+        }
+        else {
           Alert.alert("Invalid Username or Password");
         }
       } else {
