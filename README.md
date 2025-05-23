@@ -4,19 +4,19 @@ A simple and intuitive habit tracking mobile application that helps users build 
 
 ---
 
-## 🚀 Features
+##  Features
 
-- ✅ Create and manage habits
-- 📆 Track daily progress
-- 📊 Boolean habits: mark as done/not done
-- 🔢 Count-based habits: input progress (e.g., drink 8 glasses of water)
-- 📅 Weekly view to monitor past performance
-- 🗓️ View task details
-- ✏️ Edit or delete tasks
+- Create and manage habits
+- Track daily progress
+- Boolean habits: mark as done/not done
+- Count-based habits: input progress (e.g., drink 8 glasses of water)
+- Weekly view to monitor past performance
+- View task details
+- Edit or delete tasks
 
 ---
 
-## 🛠️ Built With
+## Built With
 
 - **React Native**
 - **TypeScript**
@@ -26,30 +26,29 @@ A simple and intuitive habit tracking mobile application that helps users build 
 
 ---
 
-## 📷 Screenshots
+## Screenshots
 
-> *(Add app screenshots here to showcase UI and features)*
+| | | |
+|---|---|---|
+| ![image1](src/readmefiles/img-1.png) | ![image2](src/readmefiles/img-2.png) | ![image3](src/readmefiles/img-3.png) |
+| ![image4](src/readmefiles/img-4.png) | ![image5](src/readmefiles/img-5.png) | ![image6](src/readmefiles/img-6.png) |
+| ![image7](src/readmefiles/img-7.png) | ![image8](src/readmefiles/img-8.png) |  |
+---
+
+## Demo Video
+
+[Watch Demo](src/readmefiles/habit-tracker.mp4)
 
 ---
 
-## 🎥 Demo Video
-
-> *(Embed or link a short video demo of the app here)*
-
----
-
-## 📦 Installation
+## Installation
 
 ```bash
-# Clone the repo
 git clone "https://github.com/vipusrihar/habit_tracker.git"
 
-# Navigate to the project directory
 cd habit_tracker
 
-# Install dependencies
 npm install
 
-# Start the app (Android)
 npx react-native run-android
  ```
