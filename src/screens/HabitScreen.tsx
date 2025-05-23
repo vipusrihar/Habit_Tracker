@@ -19,7 +19,7 @@ const getTodayDate = () => new Date().toISOString().split('T')[0];
 const HabitScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [tasks, setTasks] = useState<HabitTask[]>([]);
-  const [filter, setFilter] = useState<'all' | 'today' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'today' | 'completed' | 'daily' | 'weekly' >('all');
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -65,39 +65,51 @@ const HabitScreen = () => {
 
 
   const filteredTasks = tasks.filter((task) => {
-    const today = getTodayDate();
+  const today = getTodayDate();
 
-    switch (filter) {
-      case 'all':
+  switch (filter) {
+    case 'all':
+      return true;
+
+    case 'today':
+      if (task.startDate > today) return false;
+
+      if (task.type === 'daily') {
         return true;
+      } else if (task.type === 'weekly') {
+        const dayOfWeek = new Date(today).toLocaleDateString('en-US', { weekday: 'short' });
+        return task.weekDays?.includes(dayOfWeek);
+      }
+      return false;
 
-      case 'today':
-        if (task.startDate > today) return false;
+    case 'daily':
+      return task.type === 'daily';
 
-        if (task.type === 'daily') {
-          return true;
-        } else if (task.type === 'weekly') {
-          const dayOfWeek = new Date(today).toLocaleDateString('en-US', { weekday: 'short' });
-          return task.weekDays?.includes(dayOfWeek);
-        }
-        return false;
+    case 'weekly':
+      return task.type === 'weekly';
 
-      default:
-        return true;
-    }
-  });
+    default:
+      return true;
+  }
+});
 
-
+// Then update your filter options in the UI:
   return (
     <SafeAreaView style={{ flex: 1, padding: 0, margin: 0 }}>
       <View style={styles.filterContainer}>
-        <TouchableOpacity onPress={() => setFilter('all')}>
-          <Text style={[styles.filterText, filter === 'all' && styles.activeFilter]}>All</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setFilter('today')}>
-          <Text style={[styles.filterText, filter === 'today' && styles.activeFilter]}>Today</Text>
-        </TouchableOpacity>
-      </View>
+  <TouchableOpacity onPress={() => setFilter('all')}>
+    <Text style={[styles.filterText, filter === 'all' && styles.activeFilter]}>All</Text>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={() => setFilter('today')}>
+    <Text style={[styles.filterText, filter === 'today' && styles.activeFilter]}>Today</Text>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={() => setFilter('daily')}>
+    <Text style={[styles.filterText, filter === 'daily' && styles.activeFilter]}>Daily</Text>
+  </TouchableOpacity>
+  <TouchableOpacity onPress={() => setFilter('weekly')}>
+    <Text style={[styles.filterText, filter === 'weekly' && styles.activeFilter]}>Weekly</Text>
+  </TouchableOpacity>
+</View>
 
       <ScrollView>
         <View>
