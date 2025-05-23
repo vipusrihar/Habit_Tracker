@@ -98,6 +98,10 @@ const WeeklyViewScreen = () => {
     setInputCount('');
   };
 
+  const dailyHabits = habits.filter(habit => habit.type === 'daily');
+  const weeklyHabits = habits.filter(habit => habit.type === 'weekly');
+
+
   const renderHabitRow = (habit: HabitTask) => (
     <View key={habit.id} style={styles.habitRow}>
       <Text style={[styles.habitTitle, { backgroundColor: "#e46529" }]}>
@@ -180,7 +184,27 @@ const WeeklyViewScreen = () => {
           ))}
         </View>
 
-        {habits.map(renderHabitRow)}
+        {dailyHabits.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>DAILY HABITS</Text>
+            </View>
+            {dailyHabits.map(renderHabitRow)}
+          </>
+        )}
+
+        {(dailyHabits.length > 0 && weeklyHabits.length > 0) && (
+          <View style={styles.divider} />
+        )}
+
+        {weeklyHabits.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>WEEKLY HABITS</Text>
+            </View>
+            {weeklyHabits.map(renderHabitRow)}
+          </>
+        )}
       </ScrollView>
 
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -349,5 +373,25 @@ const styles = StyleSheet.create({
   },
   percertageContainer : {
     alignItems : 'center'
-  }
+  },
+  sectionHeader: {
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginTop: 5,
+    marginBottom: 5,
+    borderLeftWidth: 4,
+    borderLeftColor: '#ee771d',
+  },
+  sectionHeaderText: {
+    fontWeight: 'bold',
+    color: '#555',
+    fontSize: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginVertical: 5,
+    marginHorizontal: 5,
+  },
 });
