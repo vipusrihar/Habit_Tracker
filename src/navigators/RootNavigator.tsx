@@ -12,15 +12,6 @@ const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
   const { isLoggedIn } = useContext(LoginContext);
 
-  if (isLoggedIn === null) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#ff993f" />
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return isLoggedIn ? (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Main" component={MainPage} />

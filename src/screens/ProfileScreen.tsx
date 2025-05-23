@@ -55,6 +55,7 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.title}>{user.username}</Text>
       <Text style={styles.title}>{user.email}</Text>
 

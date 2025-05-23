@@ -21,6 +21,8 @@ const AddHabitForm = () => {
   const [progressType, setProgressType] = useState<ProgressType>('boolean');
   const [targetValue, setTargetValue] = useState('');
   const [color, setColor] = useState('#ff9800');
+  const [weekDays, setWeekDays] = useState<string[]>([]);
+
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const route = useRoute<RouteProp<{ params: { task?: HabitTask } }, 'params'>>();
@@ -35,6 +37,17 @@ const AddHabitForm = () => {
     }
   }, [taskToEdit]);
 
+  const toggleWeekDay = (day: string) => {
+  if (weekDays.includes(day)) {
+    setWeekDays(weekDays.filter((d) => d !== day));
+  } else {
+    setWeekDays([...weekDays, day]);
+  }
+};
+
+const allWeekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+
   const handleAdd = async () => {
     if (!title.trim()) {
       Alert.alert('Error', 'Title is required');
@@ -42,15 +55,16 @@ const AddHabitForm = () => {
     }
 
     const newHabit: HabitTask = {
-      id: taskToEdit?.id || '',
+      id: taskToEdit?.id || '' ,
       title,
       type,
       progressType,
       targetValue: progressType !== 'boolean' && targetValue ? parseInt(targetValue) : undefined,
       startDate: taskToEdit?.startDate || new Date().toISOString().split("T")[0],
       streakCount: taskToEdit?.streakCount || 0,
-      completionHistory: taskToEdit?.completionHistory || (progressType === 'boolean' ? [] : {}),
       color,
+      weekDays:weekDays,
+      completionHistory: taskToEdit?.completionHistory || {},
     };
 
     try {
@@ -86,7 +100,29 @@ const AddHabitForm = () => {
         style={styles.picker}
       >
         <Picker.Item label="Daily" value="daily" />
+        <Picker.Item label="Weekly" value="weekly" />
       </Picker>
+
+
+      {type !== 'daily' && (
+        <>
+          <Text style={styles.label}>Select Week Days</Text>
+          <View style={styles.weekdayContainer}>
+            {allWeekDays.map((day) => (
+              <TouchableOpacity
+                key={day}
+                style={[
+                  styles.weekdayButton,
+                  weekDays.includes(day) && styles.selectedDay,
+                ]}
+                onPress={() => toggleWeekDay(day)}
+              >
+                <Text style={styles.weekdayText}>{day}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
+      )}
 
       <Text style={styles.label}>Progress Type</Text>
       <Picker
@@ -161,4 +197,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  weekdayContainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 8,
+  marginTop: 8,
+},
+weekdayButton: {
+  backgroundColor: '#ffe0b2',
+  padding: 8,
+  borderRadius: 8,
+  margin: 4,
+  minWidth: 50,
+  alignItems: 'center',
+},
+selectedDay: {
+  backgroundColor: '#ff9800',
+},
+weekdayText: {
+  color: '#e65100',
+  fontWeight: 'bold',
+},
+
 });

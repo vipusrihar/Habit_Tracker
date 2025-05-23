@@ -6,6 +6,8 @@ import uuid from 'react-native-uuid';
 
 const HABIT_KEY = '@habit_tasks';
 
+const getTodayDate = () => new Date().toISOString().split('T')[0];
+
 //add a new task
 export const addTask = async (task: HabitTask): Promise<void> => {
   try {
@@ -64,3 +66,12 @@ export const clearAllTasks = async (): Promise<void> => {
   }
 };
 
+export const isCompletedToday = (task: HabitTask): boolean => {
+  const today = getTodayDate();
+  const record = task.completionHistory?.[today];
+  if (task.progressType === 'boolean') return record === true;
+  if (task.progressType === 'count' && typeof record === 'number') {
+    return task.targetValue !== undefined && record >= task.targetValue;
+  }
+  return false;
+};

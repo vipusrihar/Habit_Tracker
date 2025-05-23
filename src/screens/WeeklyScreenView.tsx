@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Image, Pressable } from 'react-native';
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal, Image, Pressable
+} from 'react-native';
 import { getTasks, updateTask } from '../utils/HabitStorage';
 import { HabitTask } from '../types/HabitTask';
 import { getWeekDates } from '../utils/dataHelpers';
@@ -8,25 +10,52 @@ import weekOfYear from 'dayjs/plugin/weekOfYear';
 
 dayjs.extend(weekOfYear);
 
+const isToday = (date: string) => dayjs().isSame(date, 'day');
+
 const WeeklyViewScreen = () => {
   const [habits, setHabits] = useState<HabitTask[]>([]);
   const [weekDates, setWeekDates] = useState<string[]>([]);
   const [baseDate, setBaseDate] = useState(new Date());
-
   const [modalVisible, setModalVisible] = useState(false);
   const [currentHabit, setCurrentHabit] = useState<HabitTask | null>(null);
   const [currentDate, setCurrentDate] = useState('');
   const [inputCount, setInputCount] = useState('');
+  const [todayPercentage, setTodayPercentage] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      const allTasks = await getTasks();
-      setHabits(allTasks);
-      const dates = getWeekDates(baseDate);
-      setWeekDates(dates);
+      try {
+        const allTasks = await getTasks();
+        setHabits(allTasks);
+        const dates = getWeekDates(baseDate);
+        setWeekDates(dates);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
     };
     fetchData();
   }, [baseDate]);
+
+  useEffect(() => {
+    const today = dayjs().format('YYYY-MM-DD');
+    let completed = 0;
+    let total = 0;
+
+    habits.forEach(habit => {
+      const isAllowedDay = habit.type === 'daily' || (habit.type === 'weekly' && habit.weekDays?.includes(dayjs(today).format('ddd')));
+      if (!isAllowedDay) return;
+
+      total++;
+      const value = habit.completionHistory?.[today];
+      if (habit.progressType === 'boolean') {
+        if (value === true) completed++;
+      } else if (typeof value === 'number' && habit.targetValue !== undefined && value >= habit.targetValue) {
+        completed++;
+      }
+    });
+
+    setTodayPercentage(total === 0 ? 0 : Math.round((completed / total) * 100));
+  }, [habits]);
 
   const saveHabitUpdate = async (updatedHabit: HabitTask) => {
     await updateTask(updatedHabit);
@@ -35,23 +64,18 @@ const WeeklyViewScreen = () => {
     );
   };
 
-  const isFutureDate = (date: string) => {
-    return dayjs(date).isAfter(dayjs(), 'day');
-  };
+  const isFutureDate = (date: string) => dayjs(date).isAfter(dayjs(), 'day');
 
   const toggleBooleanCompletion = (habit: HabitTask, date: string) => {
     if (isFutureDate(date)) return;
-
     const completionHistory = { ...habit.completionHistory };
     completionHistory[date] = !completionHistory[date];
-
     const updatedHabit = { ...habit, completionHistory };
     saveHabitUpdate(updatedHabit);
   };
 
   const openCountModal = (habit: HabitTask, date: string) => {
     if (isFutureDate(date)) return;
-
     setCurrentHabit(habit);
     setCurrentDate(date);
     setInputCount(habit.completionHistory?.[date]?.toString() || '');
@@ -60,7 +84,6 @@ const WeeklyViewScreen = () => {
 
   const saveCountCompletion = () => {
     if (!currentHabit) return;
-
     let count = parseInt(inputCount);
     if (isNaN(count) || count < 0) count = 0;
     if (currentHabit.targetValue !== undefined && count > currentHabit.targetValue)
@@ -68,10 +91,8 @@ const WeeklyViewScreen = () => {
 
     const completionHistory = { ...currentHabit.completionHistory };
     completionHistory[currentDate] = count;
-
     const updatedHabit = { ...currentHabit, completionHistory };
     saveHabitUpdate(updatedHabit);
-
     setModalVisible(false);
     setCurrentHabit(null);
     setInputCount('');
@@ -86,44 +107,32 @@ const WeeklyViewScreen = () => {
       {weekDates.map((date) => {
         const entry = habit.completionHistory?.[date];
         const future = isFutureDate(date);
+        const dayOfWeek = dayjs(date).format('ddd');
+        const isAllowedDay = habit.type === 'daily' || (habit.type === 'weekly' && habit.weekDays?.includes(dayOfWeek));
+
+        if (!isAllowedDay) {
+          return <View key={date} style={[styles.dayBox, styles.dayBoxDisabled]} />;
+        }
 
         if (habit.progressType === 'boolean') {
           return (
             <TouchableOpacity
               key={date}
               disabled={future}
-              style={[
-                styles.dayBox,
-                entry ? styles.dayBoxCompleted : null,
-                future && styles.dayBoxDisabled,
-              ]}
-              onPress={() => toggleBooleanCompletion(habit, date)}
-            >
-              {entry ? (
-                <Image
-                  source={require('../assests/icons/tick.png')}
-                  style={{ width: 20, height: 20 }}
-                />
-              ) : (
-                <Text></Text>
-              )}
+              style={[styles.dayBox, isToday(date) && styles.dayBoxToday, entry ? styles.dayBoxCompleted : null, future && styles.dayBoxDisabled]}
+              onPress={() => toggleBooleanCompletion(habit, date)}>
+              {entry ? <Image source={require('../assests/icons/tick.png')} style={{ width: 20, height: 20 }} /> : <Text></Text>}
             </TouchableOpacity>
           );
         }
 
         const countText = typeof entry === 'number' ? `${entry}/${habit.targetValue}` : `0/${habit.targetValue || '?'}`;
-
         return (
           <TouchableOpacity
             key={date}
             disabled={future}
-            style={[
-              styles.dayBox,
-              typeof entry === 'number' && entry >= (habit.targetValue || 0) ? styles.dayBoxCompleted : null,
-              future && styles.dayBoxDisabled,
-            ]}
-            onPress={() => openCountModal(habit, date)}
-          >
+            style={[styles.dayBox, isToday(date) && styles.dayBoxToday, typeof entry === 'number' && entry >= (habit.targetValue || 0) ? styles.dayBoxCompleted : null, future && styles.dayBoxDisabled]}
+            onPress={() => openCountModal(habit, date)}>
             <Text style={{ fontSize: 10 }}>{countText}</Text>
           </TouchableOpacity>
         );
@@ -146,13 +155,11 @@ const WeeklyViewScreen = () => {
           </TouchableOpacity>
 
           <View style={{ alignItems: "center" }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-              {`Week ${weekNumber}`}
-            </Text>
-            <Text>
-              {weekDates[0]} - {weekDates[6]}
-            </Text>
+            <Text>Week - {weekNumber}</Text>
+            <Text>{dayjs(weekDates[0]).format("MMM D")} - {dayjs(weekDates[6]).format("MMM D, YYYY")}</Text>
+            
           </View>
+          
 
           <TouchableOpacity onPress={() => {
             const nextWeek = new Date(baseDate);
@@ -162,13 +169,14 @@ const WeeklyViewScreen = () => {
             <Image style={styles.mainImage} source={require('../assests/icons/arrow-right.png')} />
           </TouchableOpacity>
         </View>
+        <View style={styles.percertageContainer}>
+          <Text style={styles.percentageText}>Today: {todayPercentage}%</Text>
+        </View>
 
         <View style={styles.rowHeading}>
           <Text style={styles.habitTitleHeader}>Habit</Text>
           {weekDates.map((date) => (
-            <Text key={date} style={styles.dayBoxHeader}>
-              {new Date(date).toLocaleDateString('en-US', { weekday: 'short' })}
-            </Text>
+            <Text key={date} style={styles.dayBoxHeader}>{new Date(date).toLocaleDateString('en-US', { weekday: 'short' })}</Text>
           ))}
         </View>
 
@@ -178,13 +186,8 @@ const WeeklyViewScreen = () => {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              Enter count for "{currentHabit?.title}" on {currentDate}
-            </Text>
-            <Text style={styles.modalSubTitle}>
-              Max: {currentHabit?.targetValue}
-            </Text>
-
+            <Text style={styles.modalTitle}>Enter count for "{currentHabit?.title}" on {currentDate}</Text>
+            <Text style={styles.modalSubTitle}>Max: {currentHabit?.targetValue}</Text>
             <TextInput
               style={styles.input}
               keyboardType="numeric"
@@ -193,19 +196,11 @@ const WeeklyViewScreen = () => {
               placeholder="Enter count"
               placeholderTextColor="#999"
             />
-
             <View style={styles.modalButtonRow}>
-              <Pressable
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
-              >
+              <Pressable style={[styles.modalButton, styles.cancelButton]} onPress={() => setModalVisible(false)}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </Pressable>
-
-              <Pressable
-                style={[styles.modalButton, styles.saveButton]}
-                onPress={saveCountCompletion}
-              >
+              <Pressable style={[styles.modalButton, styles.saveButton]} onPress={saveCountCompletion}>
                 <Text style={styles.buttonText}>Save</Text>
               </Pressable>
             </View>
@@ -344,4 +339,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  dayBoxToday: {
+    borderColor: '#ee771d',
+    borderWidth: 2,
+  },
+  percentageText: { 
+    fontWeight: 'bold', 
+    color: '#000' 
+  },
+  percertageContainer : {
+    alignItems : 'center'
+  }
 });
