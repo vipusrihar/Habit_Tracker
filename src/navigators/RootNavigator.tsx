@@ -4,7 +4,6 @@ import MainPage from './MainPage';
 import AddHabitForm from '../components/AddHabitForm';
 import AuthStack from './AuthStack';
 import { LoginContext } from '../LoginContex';
-import { View, ActivityIndicator, Text } from 'react-native';
 import ViewTaskScreen from '../screens/ViewTaskScreen';
 
 const Stack = createNativeStackNavigator();

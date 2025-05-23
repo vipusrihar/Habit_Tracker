@@ -20,6 +20,7 @@ const HabitScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [tasks, setTasks] = useState<HabitTask[]>([]);
   const [filter, setFilter] = useState<'all' | 'today' | 'completed'>('all');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchTasks();
@@ -27,17 +28,20 @@ const HabitScreen = () => {
 
   const fetchTasks = async () => {
     try {
+      setRefreshing(true);
       const loadedTasks = await getTasks();
       console.log(loadedTasks);
       setTasks(loadedTasks);
     } catch (error) {
       Alert.alert('Error', 'Failed to load tasks.');
       console.error('Error fetching tasks:', error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
   const handleViewInfo = (task: HabitTask) => {
-    navigation.navigate('ViewTask', { task });
+    navigation.navigate('ViewTask', { taskId: task.id });
   };
 
   const handleEditTask = (task: HabitTask) => {
@@ -85,7 +89,7 @@ const HabitScreen = () => {
 
 
   return (
-    <SafeAreaView style={{ flex: 1 , padding:0, margin:0}}>
+    <SafeAreaView style={{ flex: 1, padding: 0, margin: 0 }}>
       <View style={styles.filterContainer}>
         <TouchableOpacity onPress={() => setFilter('all')}>
           <Text style={[styles.filterText, filter === 'all' && styles.activeFilter]}>All</Text>
@@ -221,7 +225,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   completedTaskItem: {
-    backgroundColor: '#d4f4d2', 
-    borderColor: '#a5d6a7',     
+    backgroundColor: '#d4f4d2',
+    borderColor: '#a5d6a7',
   },
 });
